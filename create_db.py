@@ -17,6 +17,7 @@ try:
 except psycopg2.errors.DuplicateDatabase or OperationalError:
         print("Podana baza danych już istnieje lub wystąpił problem z połączeniem!")
 
+#tworzenie tabeli 'users'
 sql_2 = '''CREATE TABLE users
 (
 id SERIAL PRIMARY KEY,
@@ -47,4 +48,5 @@ try:
 except psycopg2.errors.DuplicateTable or OperationalError:
     print("Taka tablica już istnieje lub wystąpił problem z połączeniem!")
 
+#zamknięcie połączenia
 conn.close()
