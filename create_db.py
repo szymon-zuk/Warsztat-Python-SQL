@@ -1,7 +1,7 @@
 import psycopg2
 from psycopg2 import OperationalError
 
-#tworzenie połączenia
+# tworzenie połączenia
 conn = psycopg2.connect(user="postgres",
                         password="coderslab",
                         host="localhost",
@@ -15,9 +15,9 @@ try:
     cursor.execute(sql)
     print("Baza danych została utworzona!")
 except psycopg2.errors.DuplicateDatabase or OperationalError:
-        print("Podana baza danych już istnieje lub wystąpił problem z połączeniem!")
+    print("Podana baza danych już istnieje lub wystąpił problem z połączeniem!")
 
-#tworzenie tabeli 'users'
+# tworzenie tabeli 'users'
 sql_2 = '''CREATE TABLE users
 (
 id SERIAL PRIMARY KEY,
@@ -48,5 +48,6 @@ try:
 except psycopg2.errors.DuplicateTable or OperationalError:
     print("Taka tablica już istnieje lub wystąpił problem z połączeniem!")
 
-#zamknięcie połączenia
+# zamknięcie połączenia
 conn.close()
+

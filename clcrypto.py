@@ -1,3 +1,5 @@
+import hashlib
+
 def hash_password(password, salt=None):
     """
     Hashes the password with salt as an optional parameter.

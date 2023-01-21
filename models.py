@@ -1,4 +1,14 @@
 from clcrypto import hash_password
+import psycopg2
+import datetime
+
+conn = psycopg2.connect(user="postgres",
+                        password="coderslab",
+                        host="localhost",
+                        database="workshop_db")
+
+conn.autocommit = True
+cursor = conn.cursor()
 
 
 class User:
@@ -25,14 +35,14 @@ class User:
     def save_to_db(self, cursor):
         if self._id == -1:
             sql = """INSERT INTO users(username, hashed_password)
-                            VALUES(%s, %s) RETURNING id"""
+                            VALUES(%s, %s) RETURNING id;"""
             values = (self.username, self.hashed_password)
             cursor.execute(sql, values)
             self._id = cursor.fetchone()[0]  # or cursor.fetchone()['id']
             return True
         else:
-            sql = """UPDATE Users SET username=%s, hashed_password=%s
-                           WHERE id=%s"""
+            sql = """UPDATE users SET username = %s, hashed_password = %s
+                           WHERE id=%s;"""
             values = (self.username, self.hashed_password, self.id)
             cursor.execute(sql, values)
             return True
@@ -79,3 +89,49 @@ class User:
         self._id = -1
         return True
 
+
+class Messages:
+    def __init__(self, from_id="", to_id="", text="", creation_date=None):
+        self._id = -1
+        self.from_id = from_id
+        self.to_id = to_id
+        self.text = text
+        self.creation_date = creation_date
+
+    def id(self):
+        return self._id
+
+    def save_to_db(self, cursor):
+        current_date = datetime.date.today()
+        self.creation_date = current_date
+        if self._id == -1:
+            sql = """INSERT INTO messages(from_id, to_id, text, creation_date) VALUES(%s, %s, %s, %s) RETURNING id;"""
+            values = (int(self.from_id), int(self.to_id), self.text, self.creation_date)
+            cursor.execute(sql, values)
+            self._id = cursor.fetchone()[0]  # or cursor.fetchone()['id']
+            return True
+        else:
+            sql = """UPDATE messages SET from_id = %s, to_id = %s, creation_date = %s, text = %s 
+                           WHERE id=%s;"""
+            values = (self.from_id, self.to_id, self.creation_date, self.text)
+            cursor.execute(sql, values)
+            return True
+
+    @staticmethod
+    def load_all_messages(cursor):
+        sql = "SELECT id, from_id, to_id, creation_date, text FROM messages;"
+        messages = []
+        cursor.execute(sql)
+        for row in cursor.fetchall():
+            id, from_id, to_id, creation_date, text = row
+            loaded_user = Messages()
+            loaded_user._id = id
+            loaded_user.from_id = from_id
+            loaded_user.to_id = to_id
+            loaded_user.creation_date = creation_date
+            loaded_user.text = text
+            messages.append(loaded_user)
+        return messages
+
+
+conn.close()
